@@ -1,0 +1,150 @@
+.weather-app-container {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(to bottom, #73b4e2, #6eb7f3);
+  padding: 20px;
+  color: #333;
+  border-radius: 10px;
+
+  margin: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  .weather-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #3658a4;
+  }
+
+  .search-bar {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+
+    input {
+      padding: 10px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 25px;
+      font-size: 16px;
+      text-align: center;
+      outline: none;
+    }
+  }
+
+  .current-weather-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+
+    .current-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #3658a4;
+    }
+
+    .current-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .generals {
+        text-align: left;
+
+        .city {
+          font-size: 22px;
+          font-weight: bold;
+          color: #3658a4;
+          margin-bottom: 5px;
+        }
+
+        .temperature {
+          .temp-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #4a90e2;
+          }
+
+          .temp-desc {
+            font-size: 14px;
+            color: #757575;
+          }
+        }
+      }
+
+      .details {
+        text-align: right;
+        font-size: 14px;
+
+        div {
+          margin-bottom: 5px;
+        }
+
+        .highlight {
+          color: #4a90e2;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+  .forecast-weather-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .forecast-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #3658a4;
+    }
+
+    .forecast-days {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+
+      .forecast-day {
+        text-align: center;
+        flex: 1;
+        padding: 10px;
+        border-right: 1px solid #e0e0e0;
+
+        &:last-child {
+          border-right: none;
+        }
+
+        .day-of-week {
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 5px;
+          color: #3658a4;
+        }
+
+        .icon img {
+          width: 50px;
+          height: 50px;
+        }
+
+        .description {
+          font-size: 12px;
+          color: #757575;
+          margin-bottom: 5px;
+        }
+
+        .temp {
+          font-size: 14px;
+          color: #f57c00;
+          font-weight: bold;
+        }
+      }
+    }
+  }
+
+}
