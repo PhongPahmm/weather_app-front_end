@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './App.scss';
 import { getWeatherByCity, getWeatherForecastByCity } from './api/apiService';
+import { CiSearch } from "react-icons/ci";
 
 function App() {
   const [city, setCity] = useState('Hanoi')
@@ -9,13 +10,12 @@ function App() {
 
   useEffect(() => {
     fetchWeatherCurrent()
+    fetchWeatherDaily()
   }, [])
 
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      fetchWeatherCurrent()
-      fetchWeatherDaily()
-    }
+  const handleSearch = () => {
+    fetchWeatherCurrent()
+    fetchWeatherDaily()
   }
   const fetchWeatherCurrent = async () => {
     const res = await getWeatherByCity(city)
@@ -30,8 +30,6 @@ function App() {
 
     setweatherDataDaily(dailyData)
   }
-  console.log('weather data current', weatherDataCurrent);
-
 
   return (
     <div className="weather-app-container">
@@ -44,8 +42,8 @@ function App() {
           placeholder='Search...'
           value={city}
           onChange={(e) => setCity(e.target.value)}
-          onKeyDown={handleKeyPress}
         />
+        <span onClick={handleSearch} className='search-icon'><CiSearch /></span>
       </div>
       <div className='current-weather-container'>
         <div className='current-title'>
