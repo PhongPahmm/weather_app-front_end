@@ -18,9 +18,13 @@ function App() {
   const handleSearch = () => {
     fetchWeatherCurrent()
     fetchWeatherDaily()
+    fetchWeatherHourly()
+    setCity('')
   }
   const fetchWeatherCurrent = async () => {
     const res = await getWeatherByCity(city)
+    console.log('res', res);
+
     setWeatherDataCurrent(res.data)
   }
   const fetchWeatherHourly = async () => {
@@ -35,6 +39,37 @@ function App() {
 
     setWeatherDataDaily(dailyData)
   }
+  // const fetchWeatherDaily = async () => {
+  //   const res = await getWeatherForecastDailyByCity(city)
+
+  //   const dailyData = res.data.list.reduce((acc, entry) => {
+  //     const date = new Date(entry.dt * 1000);
+  //     const hours = date.getHours();
+
+  //     // Filter entries between 0:00 and 21:00
+  //     if (hours >= 0 && hours <= 21) {
+  //       const existingDay = acc.find(day => 
+  //         new Date(day.dt * 1000).toDateString() === date.toDateString()
+  //       );
+
+  //       if (existingDay) {
+  //         existingDay.temperatures.push(entry.main.temp);
+  //       } else {
+  //         acc.push({
+  //           ...entry,
+  //           temperatures: [entry.main.temp]
+  //         });
+  //       }
+  //     }
+
+  //     return acc;
+  //   }, []).map(day => ({
+  //     ...day,
+  //     averageTemp: day.temperatures.reduce((a, b) => a + b, 0) / day.temperatures.length
+  //   }));
+
+  //   setWeatherDataDaily(dailyData);
+  // }
 
   return (
     <div className="weather-app-container">
@@ -47,14 +82,16 @@ function App() {
           placeholder='Search...'
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSearch();
+            }
+          }}
         />
         <span onClick={handleSearch} className='search-icon'><CiSearch /></span>
       </div>
       <div className='weather-content'>
         <div className='current-weather-container'>
-          <div className='current-title'>
-            Current weather
-          </div>
           {weatherDataCurrent &&
             <div className='current-info'>
               <div className='generals'>
@@ -72,15 +109,34 @@ function App() {
                     {weatherDataCurrent.weather && weatherDataCurrent.weather[0]?.description}
                   </div>
                   <div className="temp-value">
-                    {weatherDataCurrent.main.temp}°C
+                    {Math.round(weatherDataCurrent.main.temp)}°C
                   </div>
                 </div>
               </div>
               <div className="details">
-                <div>Feels like: {weatherDataCurrent.main?.feels_like}°C</div>
-                <div>Humidity: {weatherDataCurrent.main?.humidity}%</div>
-                <div>Wind: {weatherDataCurrent.wind?.speed} m/s</div>
-                <div>Pressure: {weatherDataCurrent.main?.pressure} hPa</div>
+                <div className="info-box">
+                  <div className="icon">🤲</div>
+                  <div className="value">{Math.round(weatherDataCurrent.main.feels_like)}°C</div>
+                  <div className="label">Feels Like</div>
+                </div>
+
+                <div className="info-box">
+                  <div className="icon">💧</div>
+                  <div className="value">{weatherDataCurrent.main.humidity}%</div>
+                  <div className="label">Humidity</div>
+                </div>
+
+                <div className="info-box">
+                  <div className="icon">💨</div>
+                  <div className="value">{weatherDataCurrent.wind.speed} m/s</div>
+                  <div className="label">Wind Speed</div>
+                </div>
+
+                <div className="info-box">
+                  <div className="icon">⚡</div>
+                  <div className="value">{weatherDataCurrent.main.pressure} hPa</div>
+                  <div className="label">Pressure</div>
+                </div>
               </div>
             </div>
           }
@@ -92,7 +148,7 @@ function App() {
             <div className="forecast-title-hourly">Hourly (Each 3 hours)</div>
             <div className="forecast-hours">
               {weatherDataHourly.map((entry, index) => {
-                const date = new Date(entry.dt * 1000); // Convert timestamp to Date
+                const date = new Date(entry.dt * 1000);
                 const time = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
                 const iconUrl = `https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png`;
                 const description = entry.weather[0].description;
@@ -116,10 +172,10 @@ function App() {
               <div className="forecast-title-daily">Daily</div>
               <div className="forecast-days">
                 {weatherDataDaily.map((entry, index) => {
-                  const date = new Date(entry.dt * 1000); // Chuyển timestamp thành đối tượng Date
-                  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" }); // Lấy thứ
-                  const iconUrl = `https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png`; // Icon thời tiết
-                  const description = entry.weather[0].description; // Mô tả
+                  const date = new Date(entry.dt * 1000);
+                  const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
+                  const iconUrl = `https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png`;
+                  const description = entry.weather[0].description;
                   const temp = entry.main.temp;
 
                   return (
