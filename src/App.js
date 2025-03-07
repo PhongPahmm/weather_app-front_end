@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './App.scss';
 import { getWeatherByCity, getWeatherForecastDailyByCity, getWeatherForecastHourlyByCity } from './api/apiService';
 import { CiSearch } from "react-icons/ci";
+import { toast, ToastContainer } from 'react-toastify';
 
 function App() {
   const [city, setCity] = useState('Hanoi')
@@ -16,60 +17,73 @@ function App() {
   }, [])
 
   const handleSearch = () => {
-    fetchWeatherCurrent()
-    fetchWeatherDaily()
-    fetchWeatherHourly()
-    setCity('')
-  }
+    fetchWeatherCurrent();
+    fetchWeatherDaily();
+    fetchWeatherHourly();
+  };
+  
+  
+  
   const fetchWeatherCurrent = async () => {
+    try{
     const res = await getWeatherByCity(city)
-    console.log('res', res);
-
     setWeatherDataCurrent(res.data)
+    }catch(error){
+      if(error.response.data.code === 404){
+        toast.error(error.response.data.message);
+      }
+    }
   }
   const fetchWeatherHourly = async () => {
-    const res = await getWeatherForecastHourlyByCity(city)
-    setWWeatherDataHourly(res.data.list.slice(0, 5));
-  }
+    try {
+      const res = await getWeatherForecastHourlyByCity(city);
+      setWWeatherDataHourly(res.data.list.slice(0, 5));
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.code === 404) {
+        toast.error(error.response.data.message);
+      }
+    }
+  };
+  
   const fetchWeatherDaily = async () => {
+    try{
     const res = await getWeatherForecastDailyByCity(city)
-    const dailyData = res.data.list.filter((entry) =>
-      entry.dt_txt.includes("9:00:00")
+    const dailyData = res.data.list.reduce((acc, entry) => {
+      const date = new Date(entry.dt * 1000);
+      const hours = date.getHours();
+
+      if (hours >= 0 && hours <= 21) {
+        const existingDay = acc.find(day => 
+          new Date(day.dt * 1000).toDateString() === date.toDateString()
+        );
+
+        if (existingDay) {
+          existingDay.temperatures.push(entry.main.temp);
+        } else {
+          acc.push({
+            ...entry,
+            temperatures: [entry.main.temp]
+          });
+        }
+      }
+
+      return acc;
+    }, []).map(day => ({
+      ...day,
+      averageTemp: day.temperatures.reduce((prev, current) =>prev + current, 0) / day.temperatures.length
+    }));
+    // Filter out the current day's data
+    const today = new Date().toDateString();
+    const filteredDailyData = dailyData.filter(day => 
+      new Date(day.dt * 1000).toDateString() !== today
     );
-
-    setWeatherDataDaily(dailyData)
+    setWeatherDataDaily(filteredDailyData);
+    }catch(error){
+      if(error.response.data.code === 404){
+        toast.error(error.response.data.message);
+    }
   }
-  // const fetchWeatherDaily = async () => {
-  //   const res = await getWeatherForecastDailyByCity(city)
-
-  //   const dailyData = res.data.list.reduce((acc, entry) => {
-  //     const date = new Date(entry.dt * 1000);
-  //     const hours = date.getHours();
-
-  //     // Filter entries between 0:00 and 21:00
-  //     if (hours >= 0 && hours <= 21) {
-  //       const existingDay = acc.find(day => 
-  //         new Date(day.dt * 1000).toDateString() === date.toDateString()
-  //       );
-
-  //       if (existingDay) {
-  //         existingDay.temperatures.push(entry.main.temp);
-  //       } else {
-  //         acc.push({
-  //           ...entry,
-  //           temperatures: [entry.main.temp]
-  //         });
-  //       }
-  //     }
-
-  //     return acc;
-  //   }, []).map(day => ({
-  //     ...day,
-  //     averageTemp: day.temperatures.reduce((a, b) => a + b, 0) / day.temperatures.length
-  //   }));
-
-  //   setWeatherDataDaily(dailyData);
-  // }
+}
 
   return (
     <div className="weather-app-container">
@@ -92,6 +106,7 @@ function App() {
       </div>
       <div className='weather-content'>
         <div className='current-weather-container'>
+          <ToastContainer/>
           {weatherDataCurrent &&
             <div className='current-info'>
               <div className='generals'>
@@ -152,7 +167,7 @@ function App() {
                 const time = date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
                 const iconUrl = `https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png`;
                 const description = entry.weather[0].description;
-                const temp = entry.main.temp;
+                const temp = Math.round(entry.main.temp);
 
                 return (
                   <div className="forecast-hour" key={index}>
@@ -176,7 +191,7 @@ function App() {
                   const dayOfWeek = date.toLocaleDateString("en-US", { weekday: "long" });
                   const iconUrl = `https://openweathermap.org/img/wn/${entry.weather[0].icon}@2x.png`;
                   const description = entry.weather[0].description;
-                  const temp = entry.main.temp;
+                  const temp = Math.round(entry.main.temp);
 
                   return (
                     <div className="forecast-day" key={index}>
