@@ -21,7 +21,7 @@ const App = () => {
   const [city, setCity] = useState("Hanoi");
   const [weatherDataCurrent, setWeatherDataCurrent] = useState(null);
   const [weatherDataDaily, setWeatherDataDaily] = useState(null);
-  const [weatherDataHourly, setWWeatherDataHourly] = useState([]);
+  const [weatherDataHourly, setWeatherDataHourly] = useState([]);
   const [isShowModal, setIsShowModal] = useState(false);
   const [dataModalHourlyDetail, setDataModalHourlyDetail] = useState({});
   const [dataModalDailyDetail, setDataModalDailyDetail] = useState({});
@@ -42,6 +42,7 @@ const App = () => {
       await fetchWeatherHourly();
       await fetchWeatherDaily();
     } catch (error) {
+      setIsErrorToastShown(false);
       console.error(error);
     }
   };
@@ -66,7 +67,7 @@ const App = () => {
   const fetchWeatherHourly = async () => {
     try {
       const res = await getWeatherForecastHourlyByCity(city);
-      setWWeatherDataHourly(res.data.list.slice(0, 5));
+      setWeatherDataHourly(res.data.list.slice(0, 5));
       setIsErrorToastShown(false);
     } catch (error) {
       handleError(error);
