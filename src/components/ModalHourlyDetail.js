@@ -1,6 +1,8 @@
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./ModalHourlyDetail.scss";
+import { WiHumidity } from "react-icons/wi";
+import { RiWindyLine } from "react-icons/ri";
 
 const ModalHourlyDetail = (props) => {
   const { show, setShow, data } = props;
@@ -58,15 +60,15 @@ const ModalHourlyDetail = (props) => {
               </div>
               <div className="extra-info">
                 <div className="info-box">
-                  💧{" "}
+                  <WiHumidity />{" "}
                   {data.main.humidity !== undefined
                     ? data.main.humidity
                     : "N/A"}
                   %
                 </div>
                 <div className="info-box">
-                  💨 {data.wind.speed !== undefined ? data.wind.speed : "N/A"}{" "}
-                  m/s
+                  <RiWindyLine />{" "}
+                  {data.wind.speed !== undefined ? data.wind.speed : "N/A"} m/s
                 </div>
               </div>
             </div>

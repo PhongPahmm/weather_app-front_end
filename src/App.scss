@@ -1,12 +1,10 @@
-$primary-color: #57c04d;
-$secondary-color: #ffffff;
 $text-color: #212529;
 $accent-color: #ffc107;
 $border-color: #ced4da;
 $font-family: "Poppins", sans-serif;
 
 .weather-app-container {
-  background-color: $primary-color;
+  background-image: url("./assets/weather.png");
   color: $text-color;
   font-family: $font-family;
   min-height: 100vh;
@@ -91,7 +89,7 @@ $font-family: "Poppins", sans-serif;
 
         .temp-desc {
           font-size: 16px;
-          color: #bbb;
+          color: #151515;
           margin-top: 5px;
         }
 
@@ -153,7 +151,6 @@ $font-family: "Poppins", sans-serif;
       .forecast-weather-daily {
         background-color: rgba(255, 255, 255, 0.2);
         border: 1px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
         padding: 20px;
         border-radius: 10px;
         text-align: center;

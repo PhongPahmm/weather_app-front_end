@@ -11,6 +11,11 @@ import ModalHourlyDetail from "./components/ModalHourlyDetail";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ModalDailyDetail from "./components/ModalDailyDetail";
 import "react-toastify/dist/ReactToastify.css";
+import { WiHumidity } from "react-icons/wi";
+import { RiWindyLine } from "react-icons/ri";
+import { AiFillThunderbolt } from "react-icons/ai";
+import { FiSunrise, FiSunset } from "react-icons/fi";
+import { FaHand } from "react-icons/fa6";
 
 const App = () => {
   const [city, setCity] = useState("Hanoi");
@@ -21,41 +26,50 @@ const App = () => {
   const [dataModalHourlyDetail, setDataModalHourlyDetail] = useState({});
   const [dataModalDailyDetail, setDataModalDailyDetail] = useState({});
   const [isDailyModal, setIsDailyModal] = useState(false);
+  const [isErrorToastShown, setIsErrorToastShown] = useState(false);
 
   useEffect(() => {
+    setIsErrorToastShown(false);
     fetchWeatherCurrent();
     fetchWeatherDaily();
     fetchWeatherHourly();
   }, []);
 
-  const handleSearch = () => {
-    fetchWeatherCurrent();
-    fetchWeatherDaily();
-    fetchWeatherHourly();
+  const handleSearch = async () => {
+    setIsErrorToastShown(false);
+    try {
+      await fetchWeatherCurrent();
+      await fetchWeatherHourly();
+      await fetchWeatherDaily();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleError = (error) => {
+    if (error.response?.data?.code === 404 && !isErrorToastShown) {
+      toast.error(error.response.data.message);
+      setIsErrorToastShown(true);
+      throw error;
+    }
   };
 
   const fetchWeatherCurrent = async () => {
     try {
       const res = await getWeatherByCity(city);
       setWeatherDataCurrent(res.data);
+      setIsErrorToastShown(false);
     } catch (error) {
-      if (error.response.data.code === 404) {
-        toast.error(error.response.data.message);
-      }
+      handleError(error);
     }
   };
   const fetchWeatherHourly = async () => {
     try {
       const res = await getWeatherForecastHourlyByCity(city);
       setWWeatherDataHourly(res.data.list.slice(0, 5));
+      setIsErrorToastShown(false);
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.code === 404
-      ) {
-        toast.error(error.response.data.message);
-      }
+      handleError(error);
     }
   };
 
@@ -97,10 +111,9 @@ const App = () => {
         (day) => new Date(day.dt * 1000).toDateString() !== today
       );
       setWeatherDataDaily(filteredDailyData);
+      setIsErrorToastShown(false);
     } catch (error) {
-      if (error.response.data.code === 404) {
-        toast.error(error.response.data.message);
-      }
+      handleError(error);
     }
   };
 
@@ -131,6 +144,14 @@ const App = () => {
               <div className="current-info">
                 <div className="generals">
                   <div className="city">{weatherDataCurrent.name}</div>
+                  <span className="date-time">
+                    {new Date().toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
                   <div className="temperature">
                     <div className="temp-icon">
                       {weatherDataCurrent.weather &&
@@ -152,7 +173,9 @@ const App = () => {
                 </div>
                 <div className="details">
                   <div className="info-box">
-                    <div className="icon">🤲</div>
+                    <div className="icon">
+                      <FaHand />
+                    </div>
                     <div className="value">
                       {Math.round(weatherDataCurrent.main.feels_like)}°C
                     </div>
@@ -160,7 +183,9 @@ const App = () => {
                   </div>
 
                   <div className="info-box">
-                    <div className="icon">💧</div>
+                    <div className="icon">
+                      <WiHumidity />
+                    </div>
                     <div className="value">
                       {weatherDataCurrent.main.humidity}%
                     </div>
@@ -168,7 +193,9 @@ const App = () => {
                   </div>
 
                   <div className="info-box">
-                    <div className="icon">💨</div>
+                    <div className="icon">
+                      <RiWindyLine />
+                    </div>
                     <div className="value">
                       {weatherDataCurrent.wind.speed} m/s
                     </div>
@@ -176,26 +203,44 @@ const App = () => {
                   </div>
 
                   <div className="info-box">
-                    <div className="icon">⚡</div>
+                    <div className="icon">
+                      <AiFillThunderbolt />
+                    </div>
                     <div className="value">
                       {weatherDataCurrent.main.pressure} hPa
                     </div>
                     <div className="label">Pressure</div>
                   </div>
                   <div className="info-box">
-                    <div className="icon">💨</div>
-                    <div className="value">
-                      {weatherDataCurrent.wind.speed} m/s
+                    <div className="icon">
+                      <FiSunrise />
                     </div>
-                    <div className="label">Wind Speed</div>
+                    <div className="value">
+                      {new Date(
+                        weatherDataCurrent.sys.sunrise * 1000
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </div>
+                    <div className="label">Sunrise</div>
                   </div>
 
                   <div className="info-box">
-                    <div className="icon">⚡</div>
-                    <div className="value">
-                      {weatherDataCurrent.main.pressure} hPa
+                    <div className="icon">
+                      <FiSunset />
                     </div>
-                    <div className="label">Pressure</div>
+                    <div className="value">
+                      {new Date(
+                        weatherDataCurrent.sys.sunset * 1000
+                      ).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </div>
+                    <div className="label">Sunset</div>
                   </div>
                 </div>
               </div>

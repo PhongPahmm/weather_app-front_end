@@ -1,6 +1,8 @@
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import "./ModalDailyDetail.scss";
+import { WiHumidity } from "react-icons/wi";
+import { RiWindyLine } from "react-icons/ri";
 
 const ModalDailyDetail = (props) => {
   const { show, setShow, data } = props;
@@ -8,7 +10,6 @@ const ModalDailyDetail = (props) => {
   const handleClose = () => setShow(false);
   console.log("modalDetail", data);
 
-  // Tính nhiệt độ tối thiểu và tối đa từ mảng temperatures
   const getMinTemperature = () => {
     return data.temperatures && data.temperatures.length > 0
       ? Math.min(...data.temperatures).toFixed(1)
@@ -61,15 +62,15 @@ const ModalDailyDetail = (props) => {
               </div>
               <div className="extra-info">
                 <div className="info-box">
-                  💧{" "}
+                  <WiHumidity />{" "}
                   {data.main?.humidity !== undefined
                     ? data.main.humidity
                     : "N/A"}
                   %
                 </div>
                 <div className="info-box">
-                  💨 {data.wind?.speed !== undefined ? data.wind.speed : "N/A"}{" "}
-                  m/s
+                  <RiWindyLine />
+                  {data.wind?.speed !== undefined ? data.wind.speed : "N/A"} m/s
                 </div>
               </div>
             </div>
