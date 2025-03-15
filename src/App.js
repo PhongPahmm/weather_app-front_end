@@ -28,17 +28,14 @@ const App = () => {
   const [dataModalHourlyDetail, setDataModalHourlyDetail] = useState({});
   const [dataModalDailyDetail, setDataModalDailyDetail] = useState({});
   const [isDailyModal, setIsDailyModal] = useState(false);
-  const [isErrorToastShown, setIsErrorToastShown] = useState(false);
 
   useEffect(() => {
-    setIsErrorToastShown(false);
     fetchWeatherCurrent();
     fetchWeatherDaily();
     fetchWeatherHourly();
   }, []);
 
   const handleSearch = async () => {
-    setIsErrorToastShown(false);
     setIsLoading(true);
     try {
       await fetchWeatherCurrent();
@@ -46,16 +43,15 @@ const App = () => {
       await fetchWeatherDaily();
     } catch (error) {
       console.error(error);
+      handleError(error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleError = (error) => {
-    if (error.response?.data?.code === 404 && !isErrorToastShown) {
-      toast.error(error.response.data.message);
-      setIsErrorToastShown(true);
-      return;
+    if (error.response?.status === 404) {
+      toast.error(error.response.data?.message);
     }
   };
 
@@ -63,18 +59,16 @@ const App = () => {
     try {
       const res = await getWeatherByCity(city);
       setWeatherDataCurrent(res.data);
-      setIsErrorToastShown(false);
     } catch (error) {
-      handleError(error);
+      throw error;
     }
   };
   const fetchWeatherHourly = async () => {
     try {
       const res = await getWeatherForecastHourlyByCity(city);
       setWeatherDataHourly(res.data.list.slice(0, 5));
-      setIsErrorToastShown(false);
     } catch (error) {
-      handleError(error);
+      throw error;
     }
   };
 
@@ -116,15 +110,15 @@ const App = () => {
         (day) => new Date(day.dt * 1000).toDateString() !== today
       );
       setWeatherDataDaily(filteredDailyData);
-      setIsErrorToastShown(false);
     } catch (error) {
-      handleError(error);
+      throw error;
     }
   };
 
   return (
     <>
       <div className="weather-app-container">
+        <ToastContainer />
         <div className="weather-title">Weather App</div>
         <div className="search-bar">
           <input
@@ -149,7 +143,6 @@ const App = () => {
         ) : (
           <div className="weather-content">
             <div className="current-weather-container">
-              <ToastContainer />
               {weatherDataCurrent && (
                 <div className="current-info">
                   <div className="generals">
